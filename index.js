@@ -2,6 +2,12 @@ module.exports = (fn, args) => async (req, res) => {
   try {
     // Allow passing either a function or a path to a function-module
     if (typeof fn === 'string') {
+      // Fix relative paths
+      if (fn.startsWith('.')) {
+        const path = require('path')
+        fn = path.join(path.dirname(module.parent.filename), fn)
+      }
+
       fn = await require(fn)
     }
 
