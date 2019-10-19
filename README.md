@@ -21,20 +21,35 @@ yarn add thinware
 
 ## Example
 
-### lib/hello.js
+Let's say we have some server-agnostic application logic in `lib/hello.js` that we want to expose via an API endpoint:
+
 ```js
 module.exports = name => `Hello, ${name}!`
 ```
 
-### server.js
-```js
-// (app setup omitted)
+Here's what your endpoint might look like:
 
+```js
+app.get('say-hello', async (req, res) => {
+  const hello = require('./lib/hello')
+
+  try {
+    const result = await hello(req.query.name)
+    res.send(result)
+  }
+  catch (err) {
+    res.status(500).send(err.message)
+  }
+})
+```
+
+And here's the equivalent with `thinware`:
+
+```js
 const thinware = require('thinware')
 
 app.get('say-hello',
-  thinware('./lib/hello', req => [req.query.name])
-))
+  thinware('./lib/hello', req => req.query.name))
 ```
 
 
