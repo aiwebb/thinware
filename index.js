@@ -1,4 +1,12 @@
-module.exports = (fn, args) => async (req, res) => {
+module.exports = (origFn, origArgs) => async (req, res) => {
+  // Each middleware invocation should use its own copy of original arguments -
+  // this is a somewhat unintuitive requirement. Without it, when fn & args are
+  // modified below, they are actually modifying the variables to which all
+  // future invocations are lexically bound. That is, to say the least, very
+  // undesirable behavior for middleware.
+  let fn   = origFn
+  let args = origArgs
+
   try {
     // Allow passing either a function or a path to a function-module
     if (typeof fn === 'string') {
