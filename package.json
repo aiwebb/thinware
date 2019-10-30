@@ -1,6 +1,6 @@
 {
   "name": "thinware",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A thin middleware wrapper for connecting server-agnostic application logic to req/res plumbing",
   "main": "index.js",
   "scripts": {
