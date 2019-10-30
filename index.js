@@ -51,4 +51,7 @@ const thinware = (origFn, origArgs, useNext) => async (req, res, next) => {
 
 thinware.next = (origFn, origArgs) => thinware(origFn, origArgs, true)
 
+// This module should not be cached - it'll break relative path usage
+delete require.cache[__filename]
+
 module.exports = thinware
