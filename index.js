@@ -1,4 +1,4 @@
-module.exports = (origFn, origArgs) => async (req, res) => {
+const thinware = (origFn, origArgs, useNext) => async (req, res, next) => {
   // Each middleware invocation should use its own copy of original arguments -
   // this is a somewhat unintuitive requirement. Without it, when fn & args are
   // modified below, they are actually modifying the variables to which all
@@ -31,9 +31,24 @@ module.exports = (origFn, origArgs) => async (req, res) => {
 
     // Attempt to run the function and return the result
     const result = await fn.apply(null, args)
-    res.send(result)
+
+    if (next && useNext) {
+      next(null, result)
+    }
+    else {
+      res.send(result)
+    }
   }
   catch (err) {
-    res.status(err.status || 500).send(err.message)
+    if (next && useNext) {
+      next(err)
+    }
+    else {
+      res.status(err.status || 500).send(err.message)
+    }
   }
 }
+
+thinware.next = (origFn, origArgs) => thinware(origFn, origArgs, true)
+
+module.exports = thinware

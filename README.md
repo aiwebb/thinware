@@ -1,6 +1,6 @@
 # thinware
 
-A thin middleware wrapper for connecting server-agnostic application logic to req/res plumbing.
+A thin middleware wrapper for connecting server-agnostic application logic to req/res/next plumbing.
 
 ```js
 thinware(
@@ -46,12 +46,22 @@ app.get('say-hello', async (req, res) => {
 And here's the equivalent with `thinware`:
 
 ```js
-const thinware = require('thinware')
-
-app.get('say-hello',
-  thinware('./lib/hello', req => req.query.name))
+app.get('say-hello', thinware('./lib/hello', req => req.query.name))
 ```
 
+### thinware.next()
+
+By default, `next` is not used. To invoke `next` instead of `res.send`, use `thinware.next`:
+
+```js
+app.get('/important-data',
+  // Invokes next() with result instead of res.send()
+  thinware.next(verifyToken, req => req.headers['x-token']),
+
+  // Invokes res.send() with result
+  thinware(getData, req => req.query)
+)
+```
 
 ## errdrop support
 
@@ -64,7 +74,7 @@ const Error = require('errdrop')
 
 module.exports = name => {
   if (!name) {
-    throw Error.BadRequest('name is required')
+    throw new Error.BadRequest('name is required')
   }
 
   return `Hello, ${name}!`
